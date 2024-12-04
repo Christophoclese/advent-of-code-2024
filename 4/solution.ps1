@@ -14,6 +14,7 @@ $Width = $PuzzleInput[0].Length
 $Height = $PuzzleInput.Length
 $XMASCount = 0
 $DoubleMASCount = 0
+$ValidStrings = @("MSMS", "MMSS", "SMSM", "SSMM")
 
 # Start scanning left right, top bottom
 For ($y = 0; $y -lt $Height; $y++) {
@@ -99,8 +100,44 @@ For ($y = 0; $y -lt $Height; $y++) {
         # Is the current character an A?
         If ($PuzzleInput[$y][$x] -eq "A") {
             # Not on an edge in any direction
-            If ($x + 1 -lt $Width -and $x -1 -ge 0 -and $y + 1 -lt $Height -and $y - 1 -ge 0) {
-                
+            If ($x + 1 -lt $Width -and $x - 1 -ge 0 -and $y + 1 -lt $Height -and $y - 1 -ge 0) {
+                # valid patterns
+                # M . S
+                # . A .
+                # M . S
+                # 
+                # M . M
+                # . A .
+                # S . S
+                # 
+                # S . M
+                # . A .
+                # S . M
+                # 
+                # S . S
+                # . A .
+                # M . M
+                # 
+                # Assuming
+                # 1 . 2
+                # . A .
+                # 3 . 4
+                # 
+                # Valid strings
+                # MSMS
+                # MMSS
+                # SMSM
+                # SSMM
+
+                $String = ""
+                $String += $PuzzleInput[$y - 1][$x - 1]
+                $String += $PuzzleInput[$y - 1][$x + 1]
+                $String += $PuzzleInput[$y + 1][$x - 1]
+                $String += $PuzzleInput[$y + 1][$x + 1]
+
+                If ($String -in $ValidStrings) {
+                    $DoubleMASCount++
+                }
             }
         }
 
