@@ -23,8 +23,7 @@ function CheckRules($Values, $LastChance, $Depth = 0) {
             $BeforeIndex = $Values.IndexOf($Before)
             $AfterIndex = $Values.IndexOf($After)
             If ($BeforeIndex -gt $AfterIndex) {
-                Write-Verbose "FAILED: Rule $Rule is not valid because $Before ($BeforeIndex) appears after $After ($AfterIndex)"
-
+                
                 If ($Depth -lt $Values.Count * 100 -and -not $LastChance) {
                     # We'll attempt to swap the positions of Before and After, then validate again?
                     $SwappedParts = $Values.Clone()
@@ -33,7 +32,8 @@ function CheckRules($Values, $LastChance, $Depth = 0) {
                     Write-Verbose "REPAIRING: Rule $Rule"
                     return CheckRules -Values $SwappedParts -Depth $Depth
                 }
-
+                
+                Write-Verbose "FAILED: Rule $Rule is not valid because $Before ($BeforeIndex) appears after $After ($AfterIndex)"
                 return $false
             }
             Else {
@@ -77,6 +77,7 @@ ForEach ($Update in $Updates) {
         }
 
     }
+    Write-Verbose "END: $Update"
 }
 
 Write-Host "The sum of the middle page of correctly ordered updates is: $CorrectMiddlePageSum"
