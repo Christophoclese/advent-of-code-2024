@@ -10,10 +10,6 @@ Else {
     Throw "Invalid input file: $InputFile"
 }
 
-function GetDirection($Char) {
-
-}
-
 $Width = $PuzzleInput[0].Length
 $Height = $PuzzleInput.Length
 
@@ -64,6 +60,7 @@ $VisitedLocations[$x,$y] = 'X'
 
 $Position = $StartingPosition.Clone()
 $LeftTheBuilding = $false
+$Log = @()
 
 # Start moving around until we exit the boundaries
 Do {
@@ -71,7 +68,7 @@ Do {
     $Nextx = $x + $DirMap["$Direction"].xdir
     $Nexty = $y + $DirMap["$Direction"].ydir
     If ($Map[$Nextx, $Nexty] -eq '#' -and $Nextx -gt 0 -and $Nexty -gt 0) {
-        Write-Verbose "There is a # at ($($x + $DirMap["$Direction"].xdir),$($y + $DirMap["$Direction"].ydir))"
+        Write-Verbose "There is a # at ($Nextx,$Nexty)"
         # Turn right
         $NewDirectionIndex = @($DirMap.Keys).IndexOf($Direction) + 1
         If ($NewDirectionIndex -gt @($DirMap.Keys).Count - 1) { $NewDirectionIndex = 0 }
@@ -93,6 +90,8 @@ Do {
         Else {
             # Record position
             $VisitedLocations[$x,$y] = 'X'
+            $Log += @($x,$y)
+            # Check log to see if we're looping???
         }
     }
 
