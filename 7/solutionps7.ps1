@@ -16,7 +16,7 @@ $Total = 0
 
 $threadSafeDictionary = [System.Collections.Concurrent.ConcurrentDictionary[string,object]]::new()
 
-$PuzzleInput | ForEach-Object -ThrottleLimit 50 -Parallel {
+$PuzzleInput | ForEach-Object -ThrottleLimit 10 -Parallel {
     function BuildExpressions($Operand1, $Operand2, $Operators) {
         $Expressions = @()
 
@@ -54,7 +54,7 @@ $PuzzleInput | ForEach-Object -ThrottleLimit 50 -Parallel {
                 $Expressions += BuildExpressions -Operand1 $Value -Operand2 $Numbers[$i+1] -Operators $Operators
             }
 
-            $Values = $Expressions | ForEach-Object { $_ | Invoke-Expression } | Select-Object -Unique
+            $Values = $Expressions | ForEach-Object { $_ | Invoke-Expression } | Where-Object { $_ -le $TestValue } | Select-Object -Unique
             Write-Verbose "Current values are: $($Values -Join ',')"
         }
 

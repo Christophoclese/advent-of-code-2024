@@ -7,7 +7,12 @@ function BuildExpressions($Operand1, $Operand2, $Operators) {
     $Expressions = @()
 
     ForEach ($Operator in $Operators) {
-        $Expression = "($Operand1 $Operator $Operand2)"
+        If ($Operator -eq "||") {
+            $Expression = "$Operand1$Operand2"
+        }
+        Else {
+            $Expression = "$Operand1 $Operator $Operand2"
+        }
         Write-Verbose "Adding expression: $Expression"
         $Expressions += $Expression
     }
@@ -35,7 +40,7 @@ function FixCalibration() {
             $Expressions += BuildExpressions -Operand1 $Value -Operand2 $Numbers[$i+1] -Operators $Operators
         }
 
-        $Values = $Expressions | ForEach-Object { $_ | Invoke-Expression } | Select-Object -Unique
+        $Values = $Expressions | ForEach-Object { $_ | Invoke-Expression } | Where-Object { $_ -le $TestValue } | Select-Object -Unique
         Write-Verbose "Current values are: $($Values -Join ',')"
     }
 
@@ -53,7 +58,7 @@ Else {
     Throw "Invalid input file: $InputFile"
 }
 
-$Operators = @('+','*')
+$Operators = @('+','*','||')
 $Total = 0
 
 ForEach ($Calibration in $PuzzleInput) {
