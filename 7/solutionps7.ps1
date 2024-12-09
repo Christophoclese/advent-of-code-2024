@@ -16,11 +16,9 @@ $Total = 0
 
 $threadSafeDictionary = [System.Collections.Concurrent.ConcurrentDictionary[string,object]]::new()
 
-$PuzzleInput | ForEach-Object -ThrottleLimit 10 -Parallel {
+$null = $PuzzleInput | ForEach-Object -ThrottleLimit 10 -Parallel {
     function BuildExpressions($Operand1, $Operand2, $Operators) {
-        $Expressions = @()
-
-        ForEach ($Operator in $Operators) {
+        $Expressions = ForEach ($Operator in $Operators) {
             If ($Operator -eq "||") {
                 $Expression = "$Operand1$Operand2"
             }
@@ -28,7 +26,7 @@ $PuzzleInput | ForEach-Object -ThrottleLimit 10 -Parallel {
                 $Expression = "$Operand1 $Operator $Operand2"
             }
             Write-Verbose "Adding expression: $Expression"
-            $Expressions += $Expression
+            $Expression
         }
 
         Return $Expressions
@@ -50,8 +48,8 @@ $PuzzleInput | ForEach-Object -ThrottleLimit 10 -Parallel {
         For ($i = 0; $i -lt $Numbers.Count - 1; $i++) {
             $Expressions = @()
 
-            ForEach ($Value in $Values) {
-                $Expressions += BuildExpressions -Operand1 $Value -Operand2 $Numbers[$i+1] -Operators $Operators
+            $Expressions = ForEach ($Value in $Values) {
+                BuildExpressions -Operand1 $Value -Operand2 $Numbers[$i+1] -Operators $Operators
             }
 
             $Values = $Expressions | ForEach-Object { $_ | Invoke-Expression } | Where-Object { $_ -le $TestValue } | Select-Object -Unique
@@ -70,11 +68,9 @@ $PuzzleInput | ForEach-Object -ThrottleLimit 10 -Parallel {
     $Result = FixCalibration -TestValue $Answer -Numbers $Numbers -Operators $using:Operators
     Write-Verbose "Finished work on '$_' with result = $Result"
 
-    #$Total += $Result
-
     $dict = $using:threadSafeDictionary
     $dict.TryAdd($_, $Result)
-} | Out-Null
+}
 
 $Total = $threadSafeDictionary.Values | Measure-Object -Sum | Select-Object -ExpandProperty Sum
 Write-Host "The total calibration result is: $Total"
